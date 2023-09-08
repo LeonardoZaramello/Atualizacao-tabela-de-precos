@@ -10,9 +10,8 @@ type result = {
 }
 export async function POST(req: Request, res:Response) {
     try {    
-        const jsonData = await req.json();
-        const products = jsonData.products;
-     
+        const products = await req.json();
+
         const sqlQueryValues = []
         for (let index = 0; index < products.length; index++) {
             sqlQueryValues.push(products[index].product_code);
