@@ -9,7 +9,6 @@ const acceptableCSVFileTypes = "application/vnd.openxmlformats-officedocument.sp
 export default function Home() {
   const [products, setProducts] = useState([])
   const [csvProducts, setCSVProducts] = useState<any>([])
-  // const [activeTable, setActiveTable] = useState(false)
   
   useEffect(() => {
     console.log(csvProducts);
@@ -40,7 +39,6 @@ export default function Home() {
     const productsJson = await response.json();
     
     setProducts(productsJson);
-    // setActiveTable(true);
   }
   const disableValidateButton = () => csvProducts.length == 0;
 

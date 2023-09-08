@@ -8,7 +8,17 @@ type productsFromCSV = {
     new_price: string
 }
 
-export default function ListProducts({products, csvProducts}:any){
+type product = {
+    product_code: number
+    new_price: string
+}
+
+type Props = {
+    products: productsFromCSV[],
+    csvProducts: product[],
+};
+
+export default function ListProducts({products, csvProducts}:Props){
     const [productsFromCSV, setProductsFromCSV] = useState<productsFromCSV[]>([])
     const [loadingTable, setLoadingTable] = useState(false);
 
