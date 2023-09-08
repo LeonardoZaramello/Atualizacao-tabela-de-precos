@@ -1,41 +1,52 @@
 "use client"
 import Papa from 'papaparse';
+import ListProducts from '@/app/components/ListProducts';
+import { useState, useEffect } from 'react';
+import { Truculenta } from 'next/font/google';
+import testeServerSide from './Services/services';
 
 const acceptableCSVFileTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
 
 
 export default function Home() {
+  const [products, setProducts] = useState([])
+  const [csvProducts, setCSVProducts] = useState<any>([])
+  const [activeTable, setActiveTable] = useState(false)
+  
+  useEffect(() => {
+    console.log(csvProducts);
+  }, [csvProducts])
+  
 
   // https://github.com/microsoft/TypeScript/issues/31816#issuecomment-646000392
   async function onFileChangeHandler(target: HTMLInputElement) {
     const files = target.files as FileList;
     
-    await submitFile(files);
-
-    
+    submitFile(files[0]);
+    // testeServerSide(files[0])
   }
 
-  async function postCSVFile(jsonData: any){
-    const response = await fetch("http://localhost:3000/api/csv-reader", {method: "POST", body: JSON.stringify(jsonData)})
-    console.log(response);
-    
-  }
-
-  async function submitFile(files: FileList) {
-
-    const jsonCSV = Papa.parse(files[0], {
+  function submitFile(file: File) {
+    Papa.parse(file, {
       skipEmptyLines: true,
       header: true,
       complete: function (result) {
-        postCSVFile(result.data)
+        setCSVProducts(result.data);
       }
     });
-
-    console.log("jsonCSV",jsonCSV);
   }
 
+  async function validateForms() {
+    const response = await fetch("http://localhost:3000/api/csv-reader", {method: "POST", body: JSON.stringify(csvProducts)})
+    const productsJson = await response.json();
+    
+    setProducts(productsJson);
+    setActiveTable(true);
+  }
+  const disableButton = () => csvProducts.length == 0;
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
+    <main className="flex min-h-screen flex-col items-center p-24">
       <label  
         htmlFor="csvFileSelector"
         className="flex justify-center w-full h-32 px-4 transition bg-white border-2 border-gray-300 border-dashed rounded-md appearance-none cursor-pointer hover:border-gray-400 focus:outline-none">
@@ -50,6 +61,28 @@ export default function Home() {
         </span>
         <input type="file" id="csvFileSelector" accept={acceptableCSVFileTypes} name="file_upload" className="hidden" onChange={(e) => onFileChangeHandler(e.target)}/>
       </label>
+       
+      <div className="mt-4">
+        <span>{csvProducts.length} produtos selecionados </span>
+        <button
+              type="submit"
+              className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
+              disabled={disableButton()}
+              onClick={validateForms}
+              >
+              Validar
+        </button>
+        <button
+              type="submit"
+              className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
+              disabled={true}
+              onClick={validateForms}
+              >
+              Atualizar
+        </button>
+      </div>
+ 
+      {csvProducts.length > 0 && activeTable && <ListProducts products={products}/>}
     </main>
   )
 }
