@@ -2,19 +2,18 @@
 import Papa from 'papaparse';
 import ListProducts from '@/app/components/ListProducts';
 import { useState, useEffect } from 'react';
-import { Truculenta } from 'next/font/google';
 import testeServerSide from './Services/services';
 
 const acceptableCSVFileTypes = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel, .csv";
 
-
 export default function Home() {
   const [products, setProducts] = useState([])
   const [csvProducts, setCSVProducts] = useState<any>([])
-  const [activeTable, setActiveTable] = useState(false)
+  // const [activeTable, setActiveTable] = useState(false)
   
   useEffect(() => {
     console.log(csvProducts);
+
   }, [csvProducts])
   
 
@@ -22,8 +21,8 @@ export default function Home() {
   async function onFileChangeHandler(target: HTMLInputElement) {
     const files = target.files as FileList;
     
+    setProducts([])
     submitFile(files[0]);
-    // testeServerSide(files[0])
   }
 
   function submitFile(file: File) {
@@ -41,9 +40,9 @@ export default function Home() {
     const productsJson = await response.json();
     
     setProducts(productsJson);
-    setActiveTable(true);
+    // setActiveTable(true);
   }
-  const disableButton = () => csvProducts.length == 0;
+  const disableValidateButton = () => csvProducts.length == 0;
 
   return (
     <main className="flex min-h-screen flex-col items-center p-24">
@@ -67,7 +66,7 @@ export default function Home() {
         <button
               type="submit"
               className="text-blue-700 hover:text-white border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-blue-500 dark:text-blue-500 dark:hover:text-white dark:hover:bg-blue-500 dark:focus:ring-blue-800"
-              disabled={disableButton()}
+              disabled={disableValidateButton()}
               onClick={validateForms}
               >
               Validar
@@ -75,14 +74,14 @@ export default function Home() {
         <button
               type="submit"
               className="text-green-700 hover:text-white border border-green-700 hover:bg-green-800 focus:ring-4 focus:outline-none focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 dark:border-green-500 dark:text-green-500 dark:hover:text-white dark:hover:bg-green-600 dark:focus:ring-green-800"
-              disabled={true}
+              // disabled={disableUpdateButton()}
               onClick={validateForms}
               >
               Atualizar
         </button>
       </div>
- 
-      {csvProducts.length > 0 && activeTable && <ListProducts products={products}/>}
+
+      <ListProducts products={products} csvProducts={csvProducts} />
     </main>
   )
 }
