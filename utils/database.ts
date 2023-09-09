@@ -10,7 +10,7 @@ export default async function query({query, values = []}:any){
   })
 
   try {
-    const [results] = await dbConnection.execute(query, values)
+    const [results] = await dbConnection.query(query, values)
     await dbConnection.end()
     return results;
 
