@@ -24,21 +24,6 @@ export async function POST(req: Request, res:Response) {
                 sqlProductsPriceUpdates.push(`WHEN code = ${products[index].code} THEN ${products[index].new_price}`)
             }
             else{
-
-                // sqlPacksPriceUpdates.push({
-                //     start:"START TRANSACTION;",
-                //     updateProduct:`SET @novo_preco_pacote_${[index]} = ${products[index].new_price};`,
-                //     calcNewPrice:`UPDATE products
-                //                     SET sales_price = @novo_preco_pacote_${[index]}
-                //                     WHERE code = ${products[index].code};`,
-                //     updateProductsPrice:`SET @quantidade_total_componentes_${[index]} = 0;
-                //                             SELECT SUM(qty) INTO @quantidade_total_componentes_${[index]} FROM packs WHERE pack_id = ${products[index].code};`,
-                //     updateProductsPrice2:`UPDATE products
-                //                             SET sales_price = @novo_preco_pacote_${[index]} / @quantidade_total_componentes_${[index]}
-                //                             WHERE code IN (SELECT product_id FROM packs WHERE pack_id = ${products[index].code});`,
-                //     commit: "COMMIT;"
-                // })
-                
                 sqlPacksPriceUpdates.push(
                         `
                         START TRANSACTION;
@@ -60,38 +45,21 @@ export async function POST(req: Request, res:Response) {
                         COMMIT;
                         `
                     )
-
             }
 
         }
         
 
         if(sqlPacksPriceUpdates.length > 0){
-
-            console.log("PACKS");
-            console.log(sqlPacksPriceUpdates[0]);
-
             sqlPacksPriceUpdates.forEach(async (packUpdate) =>{
                 await executeQuery({
                     query: packUpdate,
                 })as [RowDataPacket,FieldPacket[], result[]];
             })
-            // const result2 = await executeQuery({
-            //     query: sqlPacksPriceUpdates[0],
-            // })as [RowDataPacket,FieldPacket[], result[]];
 
-            // const result3 = await excuteQuery({
-            //     query:`${sqlPacksPriceUpdates.map(element => element.updateProductsPrice2).join("")}`,
-            // })as [RowDataPacket,FieldPacket[], result[]];
-
-
-            // console.log("ENTROU",result2);
-            
         }else if (sqlProductsPriceUpdates.length > 0){
 
-            console.log("PRODUTOS");
-            
-            const updatedProducts = await executeQuery({
+            await executeQuery({
                 query: `
                 UPDATE products
                 SET sales_price = CASE
@@ -102,7 +70,7 @@ export async function POST(req: Request, res:Response) {
                 `,
             })as [RowDataPacket,FieldPacket[], result[]];
     
-            const updatedPacks = await executeQuery({
+            await executeQuery({
                 query: `
                 UPDATE products AS pack
                 JOIN (
@@ -123,10 +91,7 @@ export async function POST(req: Request, res:Response) {
 
         }
 
-
-
         return new Response(JSON.stringify("PricesUpdated"));
-        
     } catch ( error ) {
         console.log( error );
     }

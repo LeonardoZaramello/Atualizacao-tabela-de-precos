@@ -41,12 +41,7 @@ export default function ListProducts({products, csvProducts}:Props){
     }, [csvProducts])
 
     async function validateTable() {
-        console.log("Atualizar Tabela");
-        
-        console.log(JSON.stringify(productsFromCSV));
-        
         const response = await fetch("http://localhost:3000/api/csv-reader/products-update", {method: "POST", body: JSON.stringify(productsFromCSV)})
-        console.log(response);
     }
 
 

@@ -25,10 +25,8 @@ export async function POST(req: Request, res:Response) {
             const element:result|any = result[index];
             element.new_price= products[index].new_price
         }
-        console.log(result);
         
         return new Response(JSON.stringify(result));
-        
     } catch ( error ) {
         console.log( error );
     }
