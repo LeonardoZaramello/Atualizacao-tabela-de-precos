@@ -9,7 +9,7 @@ First, run the development server:
 
 ```bash
 npm install
-# or
+# and
 npm run dev
 ```
 
