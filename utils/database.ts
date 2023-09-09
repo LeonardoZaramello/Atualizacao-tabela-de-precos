@@ -6,7 +6,8 @@ export default async function query({query, values = []}:any){
     port: process.env.MYSQL_PORT,
     database: process.env.MYSQL_DATABASE,
     user: process.env.MYSQL_USER,
-    password: process.env.MYSQL_PASSWORD
+    password: process.env.MYSQL_PASSWORD,
+    multipleStatements: true    
   })
 
   try {
